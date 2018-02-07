@@ -1,0 +1,9 @@
+{
+  "author": "Matt Chan",
+  "email": "mattchan@example.com",
+  "project_org": "matt-chan",
+  "project_name": "mincondapython",
+  "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
+  "description": "A cookie cutter template for a minimal python project with conda.",
+  "pypi_login": "mattchan"
+}

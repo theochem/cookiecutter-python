@@ -1,0 +1,11 @@
+*.pyc
+.coverage
+.eggs
+record.txt
+{{cookiecutter.project_slug}}.egg-info
+build
+dist
+{{cookiecutter.project_slug}}/version.py
+conda-bld
+
+.idea/

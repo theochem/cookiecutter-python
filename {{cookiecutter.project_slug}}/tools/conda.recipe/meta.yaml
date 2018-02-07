@@ -1,0 +1,33 @@
+package:
+  version: {% raw %} "{{ PROJECT_VERSION }}" {% endraw %}
+  name: '{{cookiecutter.project_name}}'
+
+source:
+  path: ../../
+
+build:
+  number: 0
+  script: python setup.py install
+
+requirements:
+  run:
+    - python
+    - numpy
+    - nose
+  build:
+    - python
+    - numpy
+    - nose
+    - setuptools
+
+about:
+  dev_url: https://github.com/{{cookiecutter.project_org}}/{{cookiecutter.project_name}}
+  description: {{cookiecutter.description}} 
+  license: GNU General Public License v3 or later (GPLv3+)
+  license_family: GPL3
+  home: https://github.com/{{cookiecutter.project_org}}/{{cookiecutter.project_name}}
+  license_file: LICENSE.txt
+  doc_url: https://github.com/{{cookiecutter.project_org}}/{{cookiecutter.project_name}}
+
+extra:
+  recipe-maintainers: {{cookiecutter.author}} <{{cookiecutter.email}}>
