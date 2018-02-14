@@ -14,20 +14,20 @@ Installation
 
 .. code:: bash
 
-    pip install {{cookiecutter.project_name}}
+    pip install {{cookiecutter.project_slug}}
 
 Alternatively, you can install {{cookiecutter.project_name}} in your home directory:
 
 .. code:: bash
 
-    pip install {{cookiecutter.project_name}} --user
+    pip install {{cookiecutter.project_slug}} --user
 
 Lastly, you can also install {{cookiecutter.project_name}} with conda. (See
 https://www.continuum.io/downloads)
 
 .. code:: bash
 
-    conda install -c {{cookiecutter.project_org}} {{cookiecutter.project_name}}
+    conda install -c {{cookiecutter.project_org}} {{cookiecutter.project_slug}}
 
 
 Testing
@@ -37,7 +37,7 @@ The tests can be executed as follows:
 
 .. code:: bash
 
-    nosetests {{cookiecutter.project_name}}
+    nosetests {{cookiecutter.project_slug}}
 
 
 Background and usage

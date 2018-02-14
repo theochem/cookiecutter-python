@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# {{cookiecutter.project_name}} is robust and very sensitive tester for analytic derivatives.
+# {{cookiecutter.description}} 
 # Copyright (C) {% now 'local', '%Y' %} {{cookiecutter.author}} <{{cookiecutter.email}}>
 #
 # This file is part of {{cookiecutter.project_name}}.
