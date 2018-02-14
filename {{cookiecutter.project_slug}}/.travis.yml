@@ -10,7 +10,7 @@ env:
     - secure: <REPLACE ME> 
     #PYPI_PASSWD
     - secure: <REPLACE ME> 
-    - PROJECT_NAME={{cookiecutter.project_name}}
+    - PROJECT_NAME={{cookiecutter.project_slug}}
     - GITHUB_REPO_NAME={{cookiecutter.project_org}}/{{cookiecutter.project_name}}
     - CONDA_PKG_NAME_PY={{cookiecutter.project_name}}
 
