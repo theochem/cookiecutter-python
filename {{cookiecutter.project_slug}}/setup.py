@@ -40,7 +40,7 @@ def get_version():
     version string with single quotes.
 
     """
-    with open('{{cookiecutter.project_name}}/version.py', 'r') as f:
+    with open('{{cookiecutter.project_slug}}/version.py', 'r') as f:
         return f.read().split('=')[-1].replace('\'', '').strip()
 
 
