@@ -1,5 +1,5 @@
 # python-cookiecutter
-cookiecutter template for a minimal python project with conda and travis
+cookiecutter template for a minimal python project with conda and travis.
 
 To use, run
 ```
