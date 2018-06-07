@@ -5,11 +5,11 @@ env:
   - MYCONDAPY=3.6
   global:
     #GITHUB_TOKEN
-    - secure: <REPLACE ME> 
+    - secure: {{cookiecutter.github_key}} 
     #ANACONDA_TOKEN
-    - secure: <REPLACE ME> 
+    - secure: {{cookiecutter.anaconda_token}}
     #PYPI_PASSWD
-    - secure: <REPLACE ME> 
+    - secure: {{cookiecutter.pypi_pass}}
     - PROJECT_NAME={{cookiecutter.project_slug}}
     - GITHUB_REPO_NAME={{cookiecutter.project_org}}/{{cookiecutter.project_name}}
     - CONDA_PKG_NAME_PY={{cookiecutter.project_name}}

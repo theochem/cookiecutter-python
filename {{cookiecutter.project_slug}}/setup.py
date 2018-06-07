@@ -40,8 +40,11 @@ def get_version():
     version string with single quotes.
 
     """
-    with open('{{cookiecutter.project_slug}}/version.py', 'r') as f:
-        return f.read().split('=')[-1].replace('\'', '').strip()
+    try:
+        with open('{{cookiecutter.project_slug}}/version.py', 'r') as f:
+            return f.read().split('=')[-1].replace('\'', '').strip()
+    except IOError:
+        return "0.0.1"
 
 
 def readme():

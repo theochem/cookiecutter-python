@@ -5,5 +5,8 @@
   "project_name": "mincondapython",
   "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '_').replace('-', '_') }}",
   "description": "A cookie cutter template for a minimal python project with conda.",
-  "pypi_login": "mattchan"
+  "pypi_login": "mattchan",
+  "github_key": "<REPLACE ME>",
+  "anaconda_token": "<REPLACE ME>",
+  "pypi_pass": "<REPLACE ME>",
 }
