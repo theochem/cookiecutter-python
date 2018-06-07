@@ -19,6 +19,9 @@ requirements:
     - numpy
     - nose
     - setuptools
+    - cython >=0.24.1
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
 
 about:
   dev_url: https://github.com/{{cookiecutter.project_org}}/{{cookiecutter.project_name}}
