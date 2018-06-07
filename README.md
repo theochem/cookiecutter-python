@@ -10,7 +10,11 @@ You will need to modify the `meta.yaml` file in the `tools/conda.recipe/` direct
 
 You will need to enable Travis-CI on your repo to have automated testing and builds. More instructions here: [https://docs.travis-ci.com/user/getting-started/]
 
-After your project has been templated and configured, you may perform a release by tagging commits in the format `x.x.x[ab]x`, where `x`s are replaced with digits. 
+You must also modify setup.py to include the Cython sources and module names. 
+
+After your project has been templated, you may perform a release by tagging commits in the format
+`x.x.x[ab]x`, where `x`s are replaced with digits. 
+
 If you wish to perform an alpha or beta release, append the optional `a` or `b` and the digit. It will be
 tagged as such in anaconda cloud.
 
