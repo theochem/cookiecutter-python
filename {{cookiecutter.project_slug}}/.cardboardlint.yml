@@ -9,4 +9,5 @@ linters:
 - pycodestyle:
     config: .pycodestylerc
 - pydocstyle:
+    config: .pydocstylerc
 - whitespace:
