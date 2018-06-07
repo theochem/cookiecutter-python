@@ -61,6 +61,14 @@ setup(
     author='{{cookiecutter.author}}',
     author_email='{{cookiecutter.email}}',
     url='https://github.com/{{cookiecutter.project_org}}/{{cookiecutter.project_name}}',
+    cmdclass={'build_ext': Cython.Build.build_ext},
+    package_dir={'{{cookiecutter.project_name}}': '{{cookiecutter.project_slug}}'},
+    ext_modules=[Extension(
+        'CYTHON_EXTENSION_PACKAGE_NAME',
+        sources=['{{cookiecutter.project_slug}}/CYTHON_SOURCES.pyx'],
+        depends=['{{cookiecutter.project_slug}}/CYTHON_DEPENDS.pxd'],
+        include_dirs=[np.get_include()],
+    )],
     packages=['{{cookiecutter.project_name}}'],
     zip_safe=False,
 )
