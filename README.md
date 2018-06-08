@@ -12,6 +12,9 @@ You will need to enable Travis-CI on your repo to have automated testing and bui
 
 You must also modify setup.py to include the Cython sources and module names. 
 
+Finally, you must modify the CMakeLists.txt files to include your sources and headers. If you have any
+special compile flags, you must also add those. If you have any link dependencies, you must also add those. This section requires a bit of familiarity with Cmake. 
+
 After your project has been templated, you may perform a release by tagging commits in the format
 `x.x.x[ab]x`, where `x`s are replaced with digits. 
 
