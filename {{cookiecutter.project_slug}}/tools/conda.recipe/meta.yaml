@@ -20,8 +20,8 @@ requirements:
     - nose
     - setuptools
     - cython >=0.24.1
-    - {% raw %} {{ compiler('c') }} {% raw %}
-    - {% raw %} {{ compiler('cxx') }} {% raw %}
+    - {% raw %} {{ compiler('c') }} {% endraw %}
+    - {% raw %} {{ compiler('cxx') }} {% endraw %}
 
 about:
   dev_url: https://github.com/{{cookiecutter.project_org}}/{{cookiecutter.project_name}}
