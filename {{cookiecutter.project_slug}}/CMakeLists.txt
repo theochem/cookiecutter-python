@@ -21,13 +21,13 @@
 #set(CMAKE_VERBOSE_MAKEFILE "ON")
 
 cmake_minimum_required(VERSION 3.1)
-project(QCGrids CXX)
+project({{cookiecutter.project_name}} CXX)
 
 # Version information
 include(CMakeListsVersion.txt.in)
-set(QCGRIDS_VERSION ${GIT_TAG_VERSION})
-set(QCGRIDS_SOVERSION ${GIT_TAG_SOVERSION})
-set(PROJECT_BRIEF "A numerical integration library for quantum chemistry.")
+set(PROJECT_VERSION ${GIT_TAG_VERSION})
+set(PROJECT_SOVERSION ${GIT_TAG_SOVERSION})
+set(PROJECT_BRIEF "{{cookiecutter.description}}")
 
 # The googletest snippets were taken from:
 #    http://crascit.com/2015/07/25/cmake-gtest/
@@ -73,12 +73,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
         # When coding (debug mode), we want to know when there might be trouble ...
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -coverage")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_CXX_FLAGS} -coverage")
-        set(QCGRIDS_DO_COVERAGE "ON")
+        set(PROJECT_DO_COVERAGE "ON")
     endif()
 endif()
 
-# Compilation of qcgrids according to qcgrids/CMakeLists.txt
-add_subdirectory(qcgrids)
+# Compilation of {{cookiecutter.project_name}} according to {{cookiecutter.project_name}}/CMakeLists.txt
+add_subdirectory({{cookiecutter.project_slug}})
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -90,8 +90,8 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 
 set(CPACK_SOURCE_GENERATOR "TGZ")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "qcgrids-${QCGRIDS_VERSION}")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "{{cookiecutter.project_name}}-${PROJECT_VERSION}")
 set(CPACK_SOURCE_IGNORE_FILES
-  "/build/;/release/;/debug/;/.git/;/python-qcgrids/;/HEADER/;${CPACK_SOURCE_IGNORE_FILES}")
+  "/build/;/release/;/debug/;/.git/;/{{cookiecutter.py_project_slug}}/;/HEADER/;${CPACK_SOURCE_IGNORE_FILES}")
 include(CPack)
 add_custom_target(sdist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)

@@ -21,30 +21,29 @@
 
 # Define test source files
 set(TEST_SOURCE_FILES
-${CMAKE_CURRENT_SOURCE_DIR}/test_scalarfns.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/test_supergrid.cpp
-${CMAKE_CURRENT_SOURCE_DIR}/common.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/<TEST1.cpp>
+${CMAKE_CURRENT_SOURCE_DIR}/<TEST2.cpp>
 )
 
 # The testing executable
-add_executable(test_qcgrids ${TEST_SOURCE_FILES})
-set_property(TARGET test_qcgrids PROPERTY CXX_STANDARD 11)
+add_executable(test_{{cookiecutter.project_name}} ${TEST_SOURCE_FILES})
+set_property(TARGET test_{{cookiecutter.project_name}} PROPERTY CXX_STANDARD 11)
 # Google test uses many tricks that generate warnings, which cannot be fixed easily.
-set_property(TARGET test_qcgrids PROPERTY COMPILE_FLAGS -Wno-error)
+set_property(TARGET test_{{cookiecutter.project_name}} PROPERTY COMPILE_FLAGS -Wno-error)
 
 # How the testing executable has to be linked...
 if(UNIX AND NOT APPLE)
   set(GCOV gcov)
 endif()
 
-target_link_libraries(test_qcgrids qcgrids ${CELLCUTOFF_LIBRARY} gtest gtest_main ${GCOV} pthread)
+target_link_libraries(test_{{cookiecutter.project_name}} {{cookiecutter.project_name}} gtest gtest_main ${GCOV} pthread)
 
 # Install the test in libexec
-install (TARGETS test_qcgrids DESTINATION libexec/qcgrids)
+install (TARGETS test_{{cookiecutter.project_name}} DESTINATION libexec/{{cookiecutter.project_slug}})
 
 # Use our own test target because ctest hides relevant output.
 add_custom_target(check
-                  COMMAND test_qcgrids
-                  DEPENDS test_qcgrids
+                  COMMAND test_{{cookiecutter.project_name}}
+                  DEPENDS test_{{cookiecutter.project_name}}
                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                   COMMENT "Running tests")
