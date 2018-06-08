@@ -8,6 +8,8 @@ $ cookiecutter https://github.com/theochem/cookiecutter-python.git
 
 You will need to modify the `meta.yaml` file in the `tools/conda.recipe/` directory to include the build and runtime dependencies for your project. A sensible default has already been provided. You may find more details about the conda recipe format here: [https://conda.io/docs/user-guide/tasks/build-packages/recipe.html]
 
+You will need to enable Travis-CI on your repo to have automated testing and builds. More instructions here: [https://docs.travis-ci.com/user/getting-started/]
+
 After your project has been templated and configured, you may perform a release by tagging commits in the format `x.x.x[ab]x`, where `x`s are replaced with digits. 
 If you wish to perform an alpha or beta release, append the optional `a` or `b` and the digit. It will be
 tagged as such in anaconda cloud.
