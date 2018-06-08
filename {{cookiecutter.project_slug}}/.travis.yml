@@ -12,7 +12,8 @@ env:
     - secure: {{cookiecutter.pypi_pass}}
     - PROJECT_NAME={{cookiecutter.project_slug}}
     - GITHUB_REPO_NAME={{cookiecutter.project_org}}/{{cookiecutter.project_name}}
-    - CONDA_PKG_NAME_PY={{cookiecutter.project_name}}
+    - CONDA_PKG_NAME_CPP={{cookiecutter.project_name}}
+    - CONDA_PKG_NAME_PY={{cookiecutter.py_project_name}}
 
 # TEMPLATED FROM https://raw.githubusercontent.com/theochem/derivcheck/master/.travis.yml
 # ####
@@ -101,22 +102,29 @@ install:
 - git fetch origin --tags &&
   export PROJECT_VERSION=$(python tools/gitversion.py) &&
   python tools/gitversion.py python > ${PROJECT_NAME}/version.py;
+  python tools/gitversion.py cmake > CMakeListsVersion.txt.in
 
 # Get a list of all build and runtime dependencies.
 # This should become easier, without the copy to conda.recipe.ugly.
 - conda render -f tools/conda.recipe/rendered.yaml tools/conda.recipe
+- conda render -f ${PYDIR}/tools/conda.recipe/rendered.yaml ${PYDIR}/tools/conda.recipe
 - CONDA_DEPENDENCIES=$(python -c "from yaml import load;
     req1 = load(open('tools/conda.recipe/rendered.yaml'))['requirements'];
-    deps = req1['build'] + req1['run'];
-    print(' '.join(set(dep.split()[0] for dep in deps)))")
+    req2 = load(open('${PYDIR}/tools/conda.recipe/rendered.yaml'))['requirements'];
+    deps = req1['build'] + req1['run'] + req2['build'] + req2['run'];
+    print(' '.join(set(dep.split()[0] for dep in deps if not dep.startswith('${CONDA_PKG_NAME_CPP}'))))")
 
 # Get the right python version for building. This only does something for 3.5.
 # Install extra package needed to make things work. Most things can be listed as
 # dependencies on metal.yaml and setup.py, unless setup.py already imports them.
 # Install conda tools for packaging and uploading
 - conda install -q python=${MYCONDAPY} anaconda-client ${CONDA_DEPENDENCIES}
+- source deactivate && source $HOME/miniconda/bin/activate
 # Install more recent stuff with pip
 - pip install --upgrade pylint codecov coverage pycodestyle pydocstyle
+# Get the latest cpplint
+- wget https://raw.githubusercontent.com/google/styleguide/gh-pages/cpplint/cpplint.py &&
+  chmod +x cpplint.py
 # Show conda info for debugging
 - conda info -a
 
@@ -129,31 +137,45 @@ script:
 # Static linting
 # --------------
 - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-    cardboardlinter --refspec $TRAVIS_BRANCH -f static;
+    cardboardlinter --refspec $TRAVIS_BRANCH -f static &&
+    (cd ${PYDIR}; cardboardlinter --refspec $TRAVIS_BRANCH -f static);
   fi
 
 # Unit tests and dynamic linting
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - if [[ $TRAVIS_TAG ]]; then
     conda build -q tools/conda.recipe &&
-    conda install --use-local ${CONDA_PKG_NAME_PY} &&
+    (cd ${PYDIR}; conda build -q tools/conda.recipe) &&
+    conda install --use-local ${CONDA_PKG_NAME_CPP} ${CONDA_PKG_NAME_PY} &&
+    ${CONDA_PREFIX}/libexec/${PROJECT_NAME}/test_${PROJECT_NAME} &&
     (cd; nosetests ${PROJECT_NAME} -v --detailed-errors) &&
-    conda uninstall ${CONDA_PKG_NAME_PY};
+    conda uninstall ${CONDA_PKG_NAME_PY} &&
+    conda uninstall ${CONDA_PKG_NAME_CPP};
   else
-    python setup.py build_ext -i &&
-    nosetests ${PROJECT_NAME}
-         -v --detailed-errors --with-coverage --cover-package=${PROJECT_NAME}
-         --cover-tests --cover-inclusive --cover-branches &&
-    coverage xml -i &&
+    (mkdir debug; cd debug; CMAKE_PREFIX_PATH=$HOME/miniconda cmake -DCMAKE_BUILD_TYPE=debug ..; VERBOSE=1 make) &&
+    (cd debug; ./${PROJECT_NAME}/tests/test_${PROJECT_NAME}) &&
 
     if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-       cardboardlinter --refspec $TRAVIS_BRANCH -f 'dynamic';
+      cardboardlinter --refspec $TRAVIS_BRANCH -f 'dynamic';
+    fi &&
+
+    (cd ${PYDIR}; PREFIX=$HOME/miniconda python setup.py build_ext -i --define CYTHON_TRACE_NOGIL) &&
+    (cd ${PYDIR};
+     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:../debug/${PROJECT_NAME} nosetests ${PROJECT_NAME}
+         -v --detailed-errors --with-coverage --cover-package=${PROJECT_NAME}
+         --cover-tests --cover-inclusive --cover-branches;
+     coverage xml -i) &&
+
+    if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+      (cd ${PYDIR}; LD_LIBRARY_PATH=$LD_LIBRARY_PATH:../debug/${PROJECT_NAME}
+       cardboardlinter --refspec $TRAVIS_BRANCH -f 'dynamic');
     fi
   fi
 
 # Make CPP and PY source package for github deployment
 - if [[ $TRAVIS_TAG ]]; then
-    python setup.py sdist;
+    (mkdir dist; cd dist; CMAKE_PREFIX_PATH=$HOME/miniconda cmake ..; make sdist) &&
+    (cd ${PYDIR}; python setup.py sdist);
   fi
 
 # Some other stuff
@@ -166,54 +188,51 @@ script:
 
 after_success:
 # Upload the coverage analysis
-- codecov -f coverage.xml
+- if ! [[ $TRAVIS_TAG ]]; then
+    codecov --file ${PYDIR}/coverage.xml &&
+    codecov;
+  fi
 
 before_deploy:
-# Try to set some env vars to configure deployment.
-# Please keep the following lines. They will be used again as soon as it is supported on
-# travis. See https://github.com/travis-ci/dpl/issues/613
-#- export IS_PRERELEASE=$(python -c 'import os; tt=os.environ["TRAVIS_TAG"]; print("true" if ("a" in tt or "b" in tt) else "false")')
-#- echo ${IS_PRERELEASE}
-- export ANACONDA_LABEL=$(python -c 'import os; tt=os.environ["TRAVIS_TAG"]; print("alpha" if ("a" in tt) else ("beta" if "b" in tt else "main"))')
-- echo ${ANACONDA_LABEL}
 
-# In deployment, the env var TRAVIS_TAG contains the name of the current version, if any.
+# Try to set some env vars to configure deployment.
+  - export ANACONDA_LABEL_ARG=$(sed -e 's/.*a.*/dev/' -e 's/.*b.*/test/' -e 's/.*.*/main/' <<< ${TRAVIS_TAG})
+
+# In deployment, the env var TRAVIS_TAG contains the name of the current tag, if any.
 deploy:
 - provider: releases
   skip_cleanup: true
   api_key: ${GITHUB_TOKEN}
-  file: dist/${PROJECT_NAME}-${TRAVIS_TAG}.tar.gz
-  on:
-    repo: ${GITHUB_REPO_NAME}
-    tags: true
-    condition: "$MYCONDAPY == 2.7 && $TRAVIS_OS_NAME == linux && $TRAVIS_TAG == *[ab]*"
-  prerelease: true
-
-- provider: releases
-  skip_cleanup: true
-  api_key: ${GITHUB_TOKEN}
-  file: dist/${PROJECT_NAME}-${TRAVIS_TAG}.tar.gz
-  on:
-    repo: ${GITHUB_REPO_NAME}
-    tags: true
-    condition: "$MYCONDAPY == 2.7 && $TRAVIS_OS_NAME == linux && $TRAVIS_TAG != *[ab]*"
-  prerelease: false
-
-- provider: script
-  skip_cleanup: true
-  script: anaconda -t $ANACONDA_TOKEN upload --force -l ${ANACONDA_LABEL} ${HOME}/miniconda/conda-bld/*/${PROJECT_NAME}-*.tar.bz2
-  on:
-    repo: ${GITHUB_REPO_NAME}
-    tags: true
-
-- provider: pypi
-  skip_cleanup: true
-  user: {{cookiecutter.pypi_login}}
-  password: ${PYPI_PASSWD}
+  file:
+  - dist/${CONDA_PKG_NAME_CPP}-${TRAVIS_TAG}.tar.gz
+  - ${PYDIR}/dist/${CONDA_PKG_NAME_PY}-${TRAVIS_TAG}.tar.gz
   on:
     repo: ${GITHUB_REPO_NAME}
     tags: true
     condition: "$TRAVIS_TAG != *[ab]* && $MYCONDAPY == 2.7 && $TRAVIS_OS_NAME == linux"
+  prerelease: false
+
+- provider: releases
+  skip_cleanup: true
+  api_key: ${GITHUB_TOKEN}
+  file:
+  - dist/${CONDA_PKG_NAME_CPP}-${TRAVIS_TAG}.tar.gz
+  - ${PYDIR}/dist/${CONDA_PKG_NAME_PY}-${TRAVIS_TAG}.tar.gz
+  on:
+    repo: ${GITHUB_REPO_NAME}
+    tags: true
+    condition: "$TRAVIS_TAG == *[ab]* && $MYCONDAPY == 2.7 && $TRAVIS_OS_NAME == linux"
+  prerelease: true
+
+- provider: script
+  skip_cleanup: true
+  script:
+    anaconda -t $ANACONDA_TOKEN upload --force -l ${ANACONDA_LABEL_ARG}
+    ${HOME}/miniconda/conda-bld/*/${CONDA_PKG_NAME_CPP}-*.tar.bz2
+    ${HOME}/miniconda/conda-bld/*/${CONDA_PKG_NAME_PY}-*.tar.bz2
+  on:
+    repo: ${GITHUB_REPO_NAME}
+    tags: true
 
 - provider: pages
   skip_cleanup: true

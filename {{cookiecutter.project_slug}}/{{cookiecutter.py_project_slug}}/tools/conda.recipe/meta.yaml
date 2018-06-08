@@ -7,15 +7,24 @@ source:
 
 build:
   number: 0
+  string: {% raw %} py{{ CONDA_PY }}_0 {% endraw %}
   script: python setup.py install
 
 requirements:
   run:
-    - <ADD RUNTIME DEPS HERE>
+    - python
+    - numpy
+    - nose
+    - {{cookiecutter.project_name}}
   build:
-    - cmake
+    - python
+    - numpy
+    - nose
+    - setuptools
+    - cython >=0.24.1
     - {% raw %} {{ compiler('c') }} {% endraw %}
     - {% raw %} {{ compiler('cxx') }} {% endraw %}
+    - {{cookiecutter.project_name}}
 
 about:
   dev_url: https://github.com/{{cookiecutter.project_org}}/{{cookiecutter.project_name}}
