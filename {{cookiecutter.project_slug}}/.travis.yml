@@ -13,6 +13,7 @@ env:
     - PROJECT_NAME={{cookiecutter.project_slug}}
     - GITHUB_REPO_NAME={{cookiecutter.project_org}}/{{cookiecutter.project_name}}
     - CONDA_PKG_NAME_PY={{cookiecutter.project_name}}
+    - PYPI_LOGIN={{cookiecutter.pypi_login}}
 
 # TEMPLATED FROM https://raw.githubusercontent.com/theochem/derivcheck/master/.travis.yml
 # ####
@@ -208,7 +209,7 @@ deploy:
 
 - provider: pypi
   skip_cleanup: true
-  user: {{cookiecutter.pypi_login}}
+  user: ${PYPI_LOGIN}
   password: ${PYPI_PASSWD}
   on:
     repo: ${GITHUB_REPO_NAME}
