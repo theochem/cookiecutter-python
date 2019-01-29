@@ -4,10 +4,44 @@ env:
 #  - MYCONDAPY=3.5
   - MYCONDAPY=3.6
   global:
+    # Instructions for (re)setting up a GITHUB_TOKEN, for theochem admins
+    #   0) Install the travis-ci command-line client.
+    #      https://github.com/travis-ci/travis.rb#installation
+    #   1) Login with the Roberto's account on github.com.
+    #   2) Go to profile settings. (https://github.com/settings/profile)
+    #   3) Select "Developer settings".
+    #   4) Select "Personal access tokens".
+    #   5) Create a new token "automatic releases for theochem/***" and
+    #      activate "public_repo", then save.
+    #   6) Copy the token. It is only shown once.
+    #   7) Encrypt the token on the command line
+    #      travis encrypt --pro GITHUB_TOKEN="[copy-paste-your-github-token]"
+    #      This command asks for a username and password. Roberto's account
+    #      must be used.
+    #   8) Copy-paste the encrypted line below
     #GITHUB_TOKEN
     - secure: {{cookiecutter.github_key}} 
+    # Instructions for (re)setting up ANACONDA_TOKEN, for theochem admins
+    #   0) Install travis-ci command-line client.
+    #   1) Login with Roberto's account on anaconda.org
+    #   2) Go to profile settings. (https://anaconda.org/theochem/settings/profile)
+    #   3) Select "Access".
+    #   4) Create a new token (all operations)
+    #   5) Copy the token.
+    #   6) Encrypt the token on the command line
+    #      travis encrypt --pro ANACONDA_TOKEN="[copy-paste-your-anaconda-token]"
+    #      This command asks for a username and password. Roberto's account
+    #      must be used.
+    #   7) Copy-paste the encrypted line below
     #ANACONDA_TOKEN
     - secure: {{cookiecutter.anaconda_token}}
+    # Instructions for (re)setting up PYPI_PASSWD, for theochem admins
+    #   0) Install travis-ci command-line client.
+    #   1) Encrypt Roberto's Pypo password on the command line
+    #      travis encrypt --pro PYPI_PASSWD="[copy-paste-pypi-password]"
+    #      This command asks for a username and password. Roberto's account
+    #      must be used.
+    #   2) Copy-paste the encrypted line below
     #PYPI_PASSWD
     - secure: {{cookiecutter.pypi_pass}}
     - PROJECT_NAME={{cookiecutter.project_slug}}
