@@ -20,7 +20,7 @@ env:
     #      must be used.
     #   8) Copy-paste the encrypted line below
     #GITHUB_TOKEN
-    - secure: {{cookiecutter.github_key}} 
+    - secure: {{cookiecutter.github_key}}
     # Instructions for (re)setting up ANACONDA_TOKEN, for theochem admins
     #   0) Install travis-ci command-line client.
     #   1) Login with Roberto's account on anaconda.org
